@@ -1,0 +1,91 @@
+
+name: Build Installers
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install dependencies
+        run: sudo apt-get install -y fakeroot
+
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Build Linux installer (.deb)
+        run: |
+          jpackage \
+            --input target \
+            --name "ArkVideoPlayer" \
+            --main-jar video-music-player-1.0-SNAPSHOT.jar \
+            --main-class videoPlayer.VideoMusicPlayer \
+            --type deb \
+            --icon src/main/resources/icon.png \
+            --app-version 1.0 \
+            --vendor "ArkVideo" \
+            --description "Modern Video and Music Player" \
+            --linux-shortcut \
+            --linux-menu-group "AudioVideo" \
+            --dest installers/linux
+
+      - name: Upload Linux installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-installer
+          path: installers/linux/*.deb
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Build Windows installer (.msi)
+        run: |
+          jpackage `
+            --input target `
+            --name "ArkVideoPlayer" `
+            --main-jar video-music-player-1.0-SNAPSHOT.jar `
+            --main-class videoPlayer.VideoMusicPlayer `
+            --type msi `
+            --icon src/main/resources/icon.ico `
+            --app-version 1.0 `
+            --vendor "ArkVideo" `
+            --description "Modern Video and Music Player" `
+            --win-dir-chooser `
+            --win-menu `
+            --win-shortcut `
+            --dest installers/windows
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-installer
+          path: installers/windows/*.msi
+
