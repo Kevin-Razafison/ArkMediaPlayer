@@ -47,24 +47,30 @@ public class VideoMusicPlayer extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Video Music Player");
+        primaryStage.setTitle("ArkVideo Music Player");
 
         // Initialize collections
         playlist = FXCollections.observableArrayList();
         mediaFiles = new ArrayList<>();
 
-        // Create main layout
+        // Create main layout with pure black background
         BorderPane root = new BorderPane();
-        root.setPadding(new Insets(10));
+        root.setPadding(new Insets(0));
+        root.setStyle("-fx-background-color: #000000;");
 
-        // Center: Media View
+        // Center: Media View with subtle neon glow
         mediaView = new MediaView();
         mediaView.setFitWidth(640);
         mediaView.setFitHeight(480);
         mediaView.setPreserveRatio(true);
         StackPane mediaContainer = new StackPane(mediaView);
-        mediaContainer.setStyle("-fx-background-color: black;");
+        mediaContainer.setStyle(
+                "-fx-background-color: #0a0a0a; " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-effect: dropshadow(gaussian, #00ff41, 8, 0.2, 0, 0);"
+        );
         mediaContainer.setMinHeight(480);
+        mediaContainer.setPadding(new Insets(15));
         root.setCenter(mediaContainer);
 
         // Right: Playlist
@@ -75,8 +81,11 @@ public class VideoMusicPlayer extends Application {
         VBox controlsBox = createControlsPanel();
         root.setBottom(controlsBox);
 
-        // Setup scene
+        // Setup scene with CSS
         Scene scene = new Scene(root, 1000, 650);
+        // Load external CSS file
+        String cssFile = getClass().getResource("/neon-style.css").toExternalForm();
+        scene.getStylesheets().add(cssFile);
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -90,14 +99,34 @@ public class VideoMusicPlayer extends Application {
 
     private VBox createPlaylistPanel() {
         VBox box = new VBox(10);
-        box.setPadding(new Insets(10));
-        box.setPrefWidth(250);
+        box.setPadding(new Insets(15));
+        box.setPrefWidth(280);
+        box.setStyle(
+                "-fx-background-color: #0a0a0a; " +
+                        "-fx-background-radius: 10; " +
+                        "-fx-border-color: #00ff41; " +
+                        "-fx-border-width: 1; " +
+                        "-fx-border-radius: 10;"
+        );
 
-        Label label = new Label("Playlist");
-        label.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        Label label = new Label("🎵 PLAYLIST");
+        label.setStyle(
+                "-fx-font-size: 14px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-text-fill: #00ff41; " +
+                        "-fx-padding: 5;"
+        );
 
         playlistView = new ListView<>(playlist);
         playlistView.setPrefHeight(400);
+        playlistView.setStyle(
+                "-fx-background-color: #000000;" +
+                        "-fx-background-radius: 10;" +
+                        "-fx-border-color: #333333;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 10;"
+        );
+        playlistView.getStyleClass().add("playlist-view");
 
         // Double-click to play
         playlistView.setOnMouseClicked(event -> {
@@ -109,11 +138,12 @@ public class VideoMusicPlayer extends Application {
             }
         });
 
-        // Playlist buttons
-        HBox playlistButtons = new HBox(5);
-        Button addButton = new Button("Add Files");
-        Button removeButton = new Button("Remove");
-        Button clearButton = new Button("Clear All");
+        // Playlist buttons with neon effect
+        HBox playlistButtons = new HBox(8);
+        playlistButtons.setAlignment(Pos.CENTER);
+        Button addButton = createNeonButton("+ Add", "#00ff41");
+        Button removeButton = createNeonButton("- Remove", "#ffffff");
+        Button clearButton = createNeonButton("Clear", "#ff0055");
 
         addButton.setOnAction(e -> addFilesToPlaylist());
         removeButton.setOnAction(e -> removeSelectedFromPlaylist());
@@ -126,22 +156,44 @@ public class VideoMusicPlayer extends Application {
     }
 
     private VBox createControlsPanel() {
-        VBox box = new VBox(10);
-        box.setPadding(new Insets(10));
+        VBox box = new VBox(15);
+        box.setPadding(new Insets(20, 15, 20, 15));
+        box.setStyle(
+                "-fx-background-color: #0a0a0a; " +
+                        "-fx-background-radius: 15 15 0 0; " +
+                        "-fx-border-color: #00ff41; " +
+                        "-fx-border-width: 2 0 0 0;"
+        );
 
-        // Status label
-        statusLabel = new Label("No media loaded");
-        statusLabel.setStyle("-fx-font-weight: bold;");
+        // Status label with subtle neon
+        statusLabel = new Label("Ready to play");
+        statusLabel.setStyle(
+                "-fx-font-weight: bold; " +
+                        "-fx-font-size: 12px; " +
+                        "-fx-text-fill: #00ff41; " +
+                        "-fx-padding: 6; " +
+                        "-fx-background-color: #000000; " +
+                        "-fx-background-radius: 6; " +
+                        "-fx-border-color: #00ff41; " +
+                        "-fx-border-width: 1; " +
+                        "-fx-border-radius: 6;"
+        );
 
-        // Seek slider
-        HBox seekBox = new HBox(10);
+        // Seek slider with neon track
+        HBox seekBox = new HBox(15);
         seekBox.setAlignment(Pos.CENTER);
         timeLabel = new Label("00:00 / 00:00");
+        timeLabel.setStyle(
+                "-fx-text-fill: #ffffff; " +
+                        "-fx-font-size: 11px; " +
+                        "-fx-font-weight: bold;"
+        );
         seekSlider = new Slider();
         seekSlider.setMin(0);
         seekSlider.setMax(100);
         seekSlider.setValue(0);
         seekSlider.setPrefWidth(500);
+        seekSlider.getStyleClass().add("neon-slider");
 
         seekSlider.setOnMousePressed(e -> isSeeking = true);
         seekSlider.setOnMouseReleased(e -> {
@@ -153,15 +205,24 @@ public class VideoMusicPlayer extends Application {
 
         seekBox.getChildren().addAll(timeLabel, seekSlider);
 
-        // Playback controls
-        HBox controlButtons = new HBox(10);
+        // Playback controls with reasonable sizes
+        HBox controlButtons = new HBox(15);
         controlButtons.setAlignment(Pos.CENTER);
 
-        prevButton = new Button("⏮ Previous");
-        playButton = new Button("▶ Play");
-        pauseButton = new Button("⏸ Pause");
-        stopButton = new Button("⏹ Stop");
-        nextButton = new Button("⏭ Next");
+        prevButton = createNeonControlButton("◀◀", "#ffffff");
+        playButton = createNeonControlButton("▶", "#00ff41");
+        pauseButton = createNeonControlButton("||", "#ffffff");
+        stopButton = createNeonControlButton("■", "#ff0055");
+        nextButton = createNeonControlButton("▶▶", "#ffffff");
+
+        // Make play button slightly larger with subtle glow
+        playButton.setStyle(
+                playButton.getStyle() +
+                        "-fx-font-size: 22px; " +
+                        "-fx-min-width: 55px; " +
+                        "-fx-min-height: 50px; " +
+                        "-fx-effect: dropshadow(gaussian, #00ff41, 10, 0.5, 0, 0);"
+        );
 
         prevButton.setOnAction(e -> playPrevious());
         playButton.setOnAction(e -> play());
@@ -171,15 +232,31 @@ public class VideoMusicPlayer extends Application {
 
         controlButtons.getChildren().addAll(prevButton, playButton, pauseButton, stopButton, nextButton);
 
-        // Volume control
-        HBox volumeBox = new HBox(10);
+        // Volume control with neon
+        HBox volumeBox = new HBox(15);
         volumeBox.setAlignment(Pos.CENTER);
-        Label volumeLabel = new Label("🔊 Volume:");
+        Label volumeLabel = new Label("🔊 VOLUME");
+        volumeLabel.setStyle(
+                "-fx-text-fill: #ffffff; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-font-size: 11px;"
+        );
         volumeSlider = new Slider(0, 100, 50);
-        volumeSlider.setPrefWidth(150);
+        volumeSlider.setPrefWidth(200);
+        volumeSlider.getStyleClass().add("neon-slider");
         volumeSlider.valueProperty().addListener((obs, oldVal, newVal) ->
                 setMediaVolume(newVal.doubleValue() / 100.0));
-        volumeBox.getChildren().addAll(volumeLabel, volumeSlider);
+
+        Label volumeValue = new Label("50%");
+        volumeValue.setStyle(
+                "-fx-text-fill: #00ff41; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-min-width: 40px;"
+        );
+        volumeSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+                volumeValue.setText(String.format("%d%%", newVal.intValue())));
+
+        volumeBox.getChildren().addAll(volumeLabel, volumeSlider, volumeValue);
 
         box.getChildren().addAll(statusLabel, seekBox, controlButtons, volumeBox);
         return box;
@@ -335,6 +412,86 @@ public class VideoMusicPlayer extends Application {
             mediaPlayer.setVolume(volume);
         }
     }
+
+    private Button createNeonButton(String text, String neonColor) {
+        Button button = new Button(text);
+        button.setStyle(
+                "-fx-background-color: #000000;" +
+                        "-fx-text-fill: " + neonColor + ";" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 10px;" +
+                        "-fx-padding: 6 12 6 12;" +
+                        "-fx-background-radius: 6;" +
+                        "-fx-border-color: " + neonColor + ";" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 6;" +
+                        "-fx-cursor: hand;"
+        );
+
+        String hoverStyle = button.getStyle() +
+                "-fx-background-color: " + neonColor + ";" +
+                "-fx-text-fill: #000000;";
+
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: #000000;" +
+                        "-fx-text-fill: " + neonColor + ";" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 10px;" +
+                        "-fx-padding: 6 12 6 12;" +
+                        "-fx-background-radius: 6;" +
+                        "-fx-border-color: " + neonColor + ";" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 6;" +
+                        "-fx-cursor: hand;"
+        ));
+
+        return button;
+    }
+
+    private Button createNeonControlButton(String symbol, String neonColor) {
+        Button button = new Button(symbol);
+        button.setStyle(
+                "-fx-background-color: #000000;" +
+                        "-fx-text-fill: " + neonColor + ";" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-min-width: 45px;" +
+                        "-fx-min-height: 42px;" +
+                        "-fx-background-radius: 50%;" +
+                        "-fx-border-color: " + neonColor + ";" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 50%;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-effect: dropshadow(gaussian, " + neonColor + ", 5, 0.3, 0, 0);"
+        );
+
+        String hoverStyle = button.getStyle() +
+                "-fx-background-color: " + neonColor + ";" +
+                "-fx-text-fill: #000000;" +
+                "-fx-scale-x: 1.05;" +
+                "-fx-scale-y: 1.05;" +
+                "-fx-effect: dropshadow(gaussian, " + neonColor + ", 8, 0.5, 0, 0);";
+
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: #000000;" +
+                        "-fx-text-fill: " + neonColor + ";" +
+                        "-fx-font-size: 18px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-min-width: 45px;" +
+                        "-fx-min-height: 42px;" +
+                        "-fx-background-radius: 50%;" +
+                        "-fx-border-color: " + neonColor + ";" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 50%;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-effect: dropshadow(gaussian, " + neonColor + ", 5, 0.3, 0, 0);"
+        ));
+
+        return button;
+    }
+
 
     private String formatTime(Duration duration) {
         int minutes = (int) duration.toMinutes();

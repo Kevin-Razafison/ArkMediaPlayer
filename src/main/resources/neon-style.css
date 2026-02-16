@@ -1,0 +1,61 @@
+/* Neon Black & White Theme - Clean Version */
+
+.playlist-view {
+    -fx-background-color: #000000;
+}
+
+.playlist-view .list-cell {
+    -fx-background-color: #000000;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 8px;
+    -fx-border-color: #1a1a1a;
+    -fx-border-width: 0 0 1 0;
+    -fx-font-size: 11px;
+}
+
+.playlist-view .list-cell:selected {
+    -fx-background-color: #00ff41;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}
+
+.playlist-view .list-cell:hover {
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: #00ff41;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 0 0 0 2;
+}
+
+.playlist-view .scroll-bar {
+    -fx-background-color: #000000;
+}
+
+.playlist-view .scroll-bar .thumb {
+    -fx-background-color: #00ff41;
+    -fx-background-radius: 4px;
+}
+
+.neon-slider .track {
+    -fx-background-color: #1a1a1a;
+    -fx-background-radius: 4px;
+    -fx-border-color: #2a2a2a;
+    -fx-border-width: 1px;
+}
+
+.neon-slider .thumb {
+    -fx-background-color: #00ff41;
+    -fx-background-radius: 50%;
+    -fx-padding: 8px;
+    -fx-effect: dropshadow(gaussian, #00ff41, 5, 0.4, 0, 0);
+}
+
+.neon-slider .thumb:hover {
+    -fx-background-color: #00ff41;
+    -fx-scale-x: 1.2;
+    -fx-scale-y: 1.2;
+    -fx-effect: dropshadow(gaussian, #00ff41, 8, 0.6, 0, 0);
+}
+
+.neon-slider:hover .track {
+    -fx-background-color: #2a2a2a;
+}
