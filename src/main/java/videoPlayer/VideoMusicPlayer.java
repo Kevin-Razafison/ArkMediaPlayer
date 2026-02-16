@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -49,6 +51,15 @@ public class VideoMusicPlayer extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("ArkVideo Music Player");
 
+        // Set application icon
+        try {
+            primaryStage.getIcons().add(new javafx.scene.image.Image(
+                    getClass().getResourceAsStream("/icon.png")
+            ));
+        } catch (Exception e) {
+            System.err.println("Could not load icon: " + e.getMessage());
+        }
+
         // Initialize collections
         playlist = FXCollections.observableArrayList();
         mediaFiles = new ArrayList<>();
@@ -58,12 +69,27 @@ public class VideoMusicPlayer extends Application {
         root.setPadding(new Insets(0));
         root.setStyle("-fx-background-color: #000000;");
 
-        // Center: Media View with subtle neon glow
+        // Center: Media View with logo overlay
         mediaView = new MediaView();
         mediaView.setFitWidth(640);
         mediaView.setFitHeight(480);
         mediaView.setPreserveRatio(true);
-        StackPane mediaContainer = new StackPane(mediaView);
+
+        // Create logo ImageView
+        javafx.scene.image.ImageView logoView = new javafx.scene.image.ImageView();
+        try {
+            javafx.scene.image.Image logo = new javafx.scene.image.Image(
+                    getClass().getResourceAsStream("/logo.png")
+            );
+            logoView.setImage(logo);
+            logoView.setFitWidth(400);
+            logoView.setPreserveRatio(true);
+            logoView.setOpacity(0.8);
+        } catch (Exception e) {
+            System.err.println("Could not load logo: " + e.getMessage());
+        }
+
+        StackPane mediaContainer = new StackPane(mediaView, logoView);
         mediaContainer.setStyle(
                 "-fx-background-color: #0a0a0a; " +
                         "-fx-background-radius: 10; " +
@@ -71,6 +97,16 @@ public class VideoMusicPlayer extends Application {
         );
         mediaContainer.setMinHeight(480);
         mediaContainer.setPadding(new Insets(15));
+
+        // Hide logo when media is playing
+        mediaView.mediaPlayerProperty().addListener((obs, oldPlayer, newPlayer) -> {
+            if (newPlayer != null) {
+                logoView.setVisible(false);
+            } else {
+                logoView.setVisible(true);
+            }
+        });
+
         root.setCenter(mediaContainer);
 
         // Right: Playlist
